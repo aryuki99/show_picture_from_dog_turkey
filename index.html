@@ -288,12 +288,10 @@
                 document.getElementById('randomImage').src = '';
                 await new Promise(resolve => setTimeout(resolve, 50));
                 
-                const link = {currentCategory.prefix}${num}
-                
                 await verifyImage(newImage);
                 currentImage = newImage;
                 document.getElementById('randomImage').src = newImage;
-                document.getElementById('imageLink').textContent = link;
+                document.getElementById('imageLink').textContent = newImage;
             } catch (error) {
                 console.error('加载失败:', error);
                 showToast('⚠️ 加载失败，正在重试...');
