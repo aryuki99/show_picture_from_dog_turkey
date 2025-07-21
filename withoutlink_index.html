@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog&Turkey</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #4f46e5;
+            --background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .category-selector {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.75rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            appearance: none;
+            font-size: 1rem;
+            color: #1e293b;
+            transition: all 0.2s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        #randomImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading #randomImage {
+            opacity: 0.5;
+        }
+
+        .link-container {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        #imageLink {
+            flex-grow: 1;
+            word-break: break-all;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .loading-indicator {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading .loading-indicator {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .image-container {
+                aspect-ratio: 3/4;
+            }
+
+            button {
+                width: 100%;
+                justify-content: center;
+                padding: 1rem;
+            }
+
+            .controls {
+                gap: 0.75rem;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐶Dog&Turkey🦃</h1>
+        
+        <div class="category-selector">
+            <select id="categorySelect" onchange="onCategoryChange()"></select>
+            <div class="select-arrow">▼</div>
+        </div>
+
+        <div class="image-container">
+            <div class="loading-indicator"></div>
+            <img id="randomImage" alt="随机图片" loading="lazy"/>
+        </div>
+        <div class="link-container">
+            <span id="imageLink"></span>
+        </div>
+        <div class="controls">
+            <button onclick="loadNewImage()">
+                <svg style="width:18px;height:18px" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                </svg>
+                change
+            </button>
+            
+        </div>
+    </div>
+
+    <script>
+        // ================= 配置区域 =================
+        const CATEGORIES = [
+            {
+                name: "doggy",   // 显示名称
+                base: "https://raw.githubusercontent.com/aryuki99/dog_turkey_show_save/main/dog/",
+                min: 1,          // 起始编号
+                max: 6,         // 结束编号
+                prefix: "D",      // 文件名前缀
+                digits: 1,        // 编号位数
+                suffix: ".jpg"    // 文件后缀
+            },
+            {
+                name: "turkey",
+                base: "https://raw.githubusercontent.com/aryuki99/dog_turkey_show_save/main/turkey/",
+                min: 1,
+                max: 6,
+                prefix: "T",
+                digits: 1,
+                suffix: ".jpg"
+            },
+            // 新分类示例：
+            //{
+                 //name: "wallpaper",
+                 //base: "https://raw.githubusercontent.com/ChinoArror/picturebag/main/wallpaper/",
+                 //min: 1,
+                 //max: 8,
+                 //prefix: "w",
+                 //digits: 2,
+                 //suffix: ".jpg"
+             //}
+        ];
+
+        // ================= 核心代码 =================
+        let currentCategory = null;
+        let currentImage = '';
+        const container = document.querySelector('.image-container');
+
+        function initCategories() {
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = '';
+            CATEGORIES.forEach((cat, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+            currentCategory = CATEGORIES[0];
+            select.value = 0;
+        }
+
+        function onCategoryChange() {
+            const index = parseInt(document.getElementById('categorySelect').value);
+            if (index >= 0 && index < CATEGORIES.length) {
+                currentCategory = CATEGORIES[index];
+                loadNewImage();
+            }
+        }
+
+        function getRandomImage() {
+            const num = Math.floor(Math.random() * (currentCategory.max - currentCategory.min + 1)) + currentCategory.min;
+            return `${currentCategory.base}${currentCategory.prefix}${num.toString().padStart(currentCategory.digits, '0')}${currentCategory.suffix}`;
+        }
+
+        async function loadNewImage() {
+            try {
+                if (!currentCategory) return;
+                
+                container.classList.add('loading');
+                const newImage = getRandomImage();
+                
+                // 强制刷新图片
+                document.getElementById('randomImage').src = '';
+                await new Promise(resolve => setTimeout(resolve, 50));
+                
+                await verifyImage(newImage);
+                currentImage = newImage;
+                document.getElementById('randomImage').src = newImage;
+                document.getElementById('imageLink').textContent = newImage;
+            } catch (error) {
+                console.error('加载失败:', error);
+                showToast('⚠️ 加载失败，正在重试...');
+                setTimeout(loadNewImage, 1000);
+            } finally {
+                container.classList.remove('loading');
+            }
+        }
+
+        async function verifyImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(url);
+                img.onerror = () => reject(new Error('无效图片链接'));
+                img.src = url;
+            });
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(currentImage)
+                .then(() => showToast('✅ 链接已复制!'))
+                .catch(() => showToast('❌ 复制失败'));
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.9);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                animation: fadeInOut 2s;
+                z-index: 1000;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // 初始化
+        initCategories();
+        loadNewImage();
+    </script>
+</body>
+</html>
