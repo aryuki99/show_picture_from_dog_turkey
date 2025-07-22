@@ -2,11 +2,11 @@
     "version": 2,
     "builds": [
         {
-            "src": "index.html",
+            "src": "index_withGoogleAnalytics.html",
             "use": "@vercel/static"
         }
     ],
     "routes": [
-        { "src": "/.*", "dest": "index.html" }
+        { "src": "/.*", "dest": "index_withGoogleAnalytics.html" }
     ]
 }
